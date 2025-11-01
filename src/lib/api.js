@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+// Normalize base URL: trim whitespace, remove trailing slashes, and strip trailing /api if present
+const RAW_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').trim();
+const NORMALIZED_BASE_URL = RAW_API_BASE_URL
+  // remove any trailing slashes
+  .replace(/\/+$/, '')
+  // if env mistakenly includes /api at the end, strip it
+  .replace(/\/(api)$/, '');
+
+const API_BASE_URL = NORMALIZED_BASE_URL;
 
 // Request deduplication cache
 const pendingRequests = new Map();
@@ -157,39 +165,39 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  register: (userData) => api.post('/auth/register', userData),
-  login: (credentials) => api.post('/auth/login', credentials),
-  logout: () => api.post('/auth/logout'),
-  getMe: () => api.get('/auth/me'),
-  confirmEmail: (data) => api.post('/auth/confirm', data),
-  resendConfirmation: (email) => api.post('/auth/resend-confirmation', { email }),
-  testLogin: () => api.post('/auth/test-login'),
+  register: (userData) => api.post('/api/auth/register', userData),
+  login: (credentials) => api.post('/api/auth/login', credentials),
+  logout: () => api.post('/api/auth/logout'),
+  getMe: () => api.get('/api/auth/me'),
+  confirmEmail: (data) => api.post('/api/auth/confirm', data),
+  resendConfirmation: (email) => api.post('/api/auth/resend-confirmation', { email }),
+  testLogin: () => api.post('/api/auth/test-login'),
 };
 
 // Appointments API
 export const appointmentsAPI = {
-  getAll: (params) => api.get('/appointments', { params }),
-  getById: (id) => api.get(`/appointments/${id}`),
-  book: (data) => api.post('/appointments/book', data),
-  approve: (id) => api.patch(`/appointments/${id}/approve`),
-  reject: (id, reason) => api.patch(`/appointments/${id}/reject`, { reason }),
-  cancel: (id) => api.patch(`/appointments/${id}/cancel`),
+  getAll: (params) => api.get('/api/appointments', { params }),
+  getById: (id) => api.get(`/api/appointments/${id}`),
+  book: (data) => api.post('/api/appointments/book', data),
+  approve: (id) => api.patch(`/api/appointments/${id}/approve`),
+  reject: (id, reason) => api.patch(`/api/appointments/${id}/reject`, { reason }),
+  cancel: (id) => api.patch(`/api/appointments/${id}/cancel`),
 };
 
 // Dentists API
 export const dentistsAPI = {
-  getAll: () => api.get('/dentists'),
-  getById: (id) => api.get(`/dentists/${id}`),
-  getProfile: (id) => api.get(`/dentists/${id}`),
-  updateProfile: (data) => api.put('/dentists/profile', data),
-  updateAvailability: (data) => api.put('/dentists/availability', data),
-  getMyAppointments: (params) => api.get('/dentists/appointments/my', { params }),
-  getAvailability: (id, date) => api.get(`/dentists/${id}/availability`, { params: { date } }),
-  getPaymentHistory: () => api.get('/dentists/payments/history'),
-  approveAppointment: (id) => api.patch(`/dentists/appointments/${id}/approve`),
-  rejectAppointment: (id, reason) => api.patch(`/dentists/appointments/${id}/reject`, { reason }),
+  getAll: () => api.get('/api/dentists'),
+  getById: (id) => api.get(`/api/dentists/${id}`),
+  getProfile: (id) => api.get(`/api/dentists/${id}`),
+  updateProfile: (data) => api.put('/api/dentists/profile', data),
+  updateAvailability: (data) => api.put('/api/dentists/availability', data),
+  getMyAppointments: (params) => api.get('/api/dentists/appointments/my', { params }),
+  getAvailability: (id, date) => api.get(`/api/dentists/${id}/availability`, { params: { date } }),
+  getPaymentHistory: () => api.get('/api/dentists/payments/history'),
+  approveAppointment: (id) => api.patch(`/api/dentists/appointments/${id}/approve`),
+  rejectAppointment: (id, reason) => api.patch(`/api/dentists/appointments/${id}/reject`, { reason }),
   uploadAvatar: (formData) => {
-    return api.post('/dentists/upload-avatar', formData, {
+    return api.post('/api/dentists/upload-avatar', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -199,36 +207,36 @@ export const dentistsAPI = {
 
 // Services API
 export const servicesAPI = {
-  getAll: () => api.get('/services'),
-  getById: (id) => api.get(`/services/${id}`),
+  getAll: () => api.get('/api/services'),
+  getById: (id) => api.get(`/api/services/${id}`),
 };
 
 // Payments API
 export const paymentsAPI = {
-  create: (data) => api.post('/payments/create', data),
+  create: (data) => api.post('/api/payments/create', data),
   execute: (data) => {
     console.log('🚨 paymentsAPI.execute called with:', data);
     console.log('🚨 API base URL:', API_BASE_URL);
-    console.log('🚨 Full URL will be:', `${API_BASE_URL}/payments/execute`);
-    return api.post('/payments/execute', data);
+    console.log('🚨 Full URL will be:', `${API_BASE_URL}/api/payments/execute`);
+    return api.post('/api/payments/execute', data);
   },
-  getHistory: () => api.get('/payments/history'),
-  getById: (id) => api.get(`/payments/${id}`),
+  getHistory: () => api.get('/api/payments/history'),
+  getById: (id) => api.get(`/api/payments/${id}`),
 };
 
 // Admin API
 export const adminAPI = {
-  getUsers: (params) => api.get('/admin/users', { params }),
-  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  getUsers: (params) => api.get('/api/admin/users', { params }),
+  deleteUser: (id) => api.delete(`/api/admin/users/${id}`),
   updateUserStatus: (id, data) => {
-    const requestKey = `PATCH:/admin/users/${id}/status:${JSON.stringify(data)}`;
+    const requestKey = `PATCH:/api/admin/users/${id}/status:${JSON.stringify(data)}`;
     
     console.log('🔧 adminAPI.updateUserStatus called:', {
       id,
       idType: typeof id,
       data,
       dataType: typeof data,
-      endpoint: `/admin/users/${id}/status`,
+      endpoint: `/api/admin/users/${id}/status`,
       method: 'PATCH',
       requestKey,
       hasPendingRequest: pendingRequests.has(requestKey),
@@ -261,7 +269,7 @@ export const adminAPI = {
     console.log('✅ adminAPI.updateUserStatus - Validation passed, making API call');
     
     // Create and cache the request promise
-    const requestPromise = api.patch(`/admin/users/${id}/status`, data)
+    const requestPromise = api.patch(`/api/admin/users/${id}/status`, data)
       .then(response => {
         console.log('🧹 adminAPI.updateUserStatus - Request completed successfully, removing from cache:', requestKey);
         pendingRequests.delete(requestKey);
@@ -282,18 +290,18 @@ export const adminAPI = {
     
     return requestPromise;
   },
-  getServices: () => api.get('/admin/services'),
-  createService: (data) => api.post('/admin/services', data),
-  updateService: (id, data) => api.put(`/admin/services/${id}`, data),
-  deleteService: (id) => api.delete(`/admin/services/${id}`),
-  getAppointments: (params) => api.get('/admin/appointments', { params }),
-  overrideAppointment: (id, data) => api.patch(`/admin/appointments/${id}/override`, data),
-  getDashboardStats: () => api.get('/admin/dashboard/stats'),
-  getAnalyticsDashboard: () => api.get('/admin/analytics/dashboard'),
-  getRevenueReport: (params) => api.get('/admin/reports/revenue', { params }),
-  getDentistRevenue: (params) => api.get('/admin/analytics/dentist-revenue', { params }),
-  getPayments: (params) => api.get('/admin/payments', { params }),
-  updatePaymentStatus: (id, data) => api.patch(`/admin/payments/${id}/status`, data),
+  getServices: () => api.get('/api/admin/services'),
+  createService: (data) => api.post('/api/admin/services', data),
+  updateService: (id, data) => api.put(`/api/admin/services/${id}`, data),
+  deleteService: (id) => api.delete(`/api/admin/services/${id}`),
+  getAppointments: (params) => api.get('/api/admin/appointments', { params }),
+  overrideAppointment: (id, data) => api.patch(`/api/admin/appointments/${id}/override`, data),
+  getDashboardStats: () => api.get('/api/admin/dashboard/stats'),
+  getAnalyticsDashboard: () => api.get('/api/admin/analytics/dashboard'),
+  getRevenueReport: (params) => api.get('/api/admin/reports/revenue', { params }),
+  getDentistRevenue: (params) => api.get('/api/admin/analytics/dentist-revenue', { params }),
+  getPayments: (params) => api.get('/api/admin/payments', { params }),
+  updatePaymentStatus: (id, data) => api.patch(`/api/admin/payments/${id}/status`, data),
 };
 
 export { api };

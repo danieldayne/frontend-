@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Clock, CalendarX } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, parseISO, isWithinInterval } from 'date-fns';
+import { dentistsAPI } from '../lib/api';
 
 const GoogleCalendarView = ({ onDateSelect, selectedDate, availableSlots = [], onTimeSelect, dentistId }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(selectedDate || new Date());
   const [monthlyAvailability, setMonthlyAvailability] = useState({});
-  const [dailySlots, setDailySlots] = useState({ available: [], unavailable: [] });
+  const [dailySlots, setDailySlots] = useState({ available: [], unavailable: [], booked: [] });
   const [leaveSchedules, setLeaveSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasClickedCalendar, setHasClickedCalendar] = useState(false);
@@ -107,15 +108,11 @@ const GoogleCalendarView = ({ onDateSelect, selectedDate, availableSlots = [], o
     setLoading(true);
     try {
       // First, get the dentist's schedule/availability settings
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://109.123.227.37:5000';
-      const dentistResponse = await fetch(`${apiBaseUrl}/api/dentists/${dentistId}`);
       let dentistSchedule = null;
-      
-      if (dentistResponse.ok) {
-        const dentistData = await dentistResponse.json();
-        dentistSchedule = dentistData.dentist?.dentist_profile?.availability;
-        console.log('Dentist schedule:', dentistSchedule);
-      }
+      const dentistResp = await dentistsAPI.getById(dentistId);
+      const dentistData = dentistResp.data;
+      dentistSchedule = dentistData.dentist?.dentist_profile?.availability;
+      console.log('Dentist schedule:', dentistSchedule);
       
       const monthStart = startOfMonth(currentMonth);
       const monthEnd = endOfMonth(currentMonth);
@@ -138,13 +135,8 @@ const GoogleCalendarView = ({ onDateSelect, selectedDate, availableSlots = [], o
         } else {
           // Dentist is available on this day, check for specific time slots
           try {
-            const response = await fetch(`${apiBaseUrl}/api/dentists/${dentistId}/availability?date=${dateStr}`);
-            if (response.ok) {
-              const data = await response.json();
-              availability[dateStr] = data.available_slots?.length > 0;
-            } else {
-              availability[dateStr] = false;
-            }
+            const { data } = await dentistsAPI.getAvailability(dentistId, dateStr);
+            availability[dateStr] = data.available_slots?.length > 0;
           } catch (error) {
             console.error('Error fetching availability for', dateStr, error);
             availability[dateStr] = false;
@@ -170,21 +162,13 @@ const GoogleCalendarView = ({ onDateSelect, selectedDate, availableSlots = [], o
       const dateStr = format(date, 'yyyy-MM-dd');
       console.log(`🔍 Fetching detailed slots for ${dateStr}`);
       
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://109.123.227.37:5000';
-      const response = await fetch(`${apiBaseUrl}/api/dentists/${dentistId}/availability?date=${dateStr}`);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📋 Daily slots response:', data);
-        
-        setDailySlots({
-          available: data.available_slots || [],
-          unavailable: data.unavailable_slots || [],
-          booked: data.booked_slots || []
-        });
-      } else {
-        console.error('❌ Failed to fetch daily slots');
-        setDailySlots({ available: [], unavailable: [], booked: [] });
-      }
+      const { data } = await dentistsAPI.getAvailability(dentistId, dateStr);
+      console.log('📋 Daily slots response:', data);
+      setDailySlots({
+        available: data.available_slots || [],
+        unavailable: data.unavailable_slots || [],
+        booked: data.booked_slots || []
+      });
     } catch (error) {
       console.error('❌ Error fetching daily slots:', error);
       setDailySlots({ available: [], unavailable: [], booked: [] });
