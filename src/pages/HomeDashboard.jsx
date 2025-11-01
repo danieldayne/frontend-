@@ -49,8 +49,8 @@ const HomeDashboard = () => {
       if (user.role === 'patient') {
         // Load patient-specific data
         const [appointmentsRes, statsRes] = await Promise.all([
-          api.get('/appointments'),
-          api.get('/patient/stats')
+          api.get('/api/appointments'),
+          api.get('/api/patient/stats')
         ]);
         
         data = {
@@ -61,8 +61,8 @@ const HomeDashboard = () => {
       } else if (user.role === 'dentist') {
         // Load dentist-specific data
         const [appointmentsRes, statsRes] = await Promise.all([
-          api.get('/dentist/appointments'),
-          api.get('/dentist/stats')
+          api.get('/api/dentist/appointments'),
+          api.get('/api/dentist/stats')
         ]);
         
         data = {
@@ -73,7 +73,7 @@ const HomeDashboard = () => {
       } else if (user.role === 'admin') {
         // Load admin-specific data
         const [statsRes] = await Promise.all([
-          api.get('/admin/stats')
+          api.get('/api/admin/stats')
         ]);
         
         data = {
