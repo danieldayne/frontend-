@@ -281,7 +281,7 @@ const PatientDashboardContent = ({ data, upcomingAppointments, thisWeekAppointme
               <div className="flex items-center space-x-3">
                 <Calendar className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-gray-900">{appointment.service}</p>
+                  <p className="font-medium text-gray-900">{appointment?.service?.name || appointment?.service || 'Service'}</p>
                   <p className="text-sm text-gray-600">
                     Dr. {appointment.dentist_name} • {formatSafeDate(appointment.appointment_time, 'PPp')}
                   </p>
@@ -411,9 +411,9 @@ const DentistDashboardContent = ({ data, upcomingAppointments, thisWeekAppointme
               <div className="flex items-center space-x-3">
                 <Clock className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-gray-900">{appointment.patient_name}</p>
+                  <p className="font-medium text-gray-900">{appointment?.service?.name || appointment?.service || 'Service'}</p>
                   <p className="text-sm text-gray-600">
-                    {appointment.service} • {formatSafeDate(appointment.appointment_time, 'p')}
+                    {appointment.patient_name} • {formatSafeDate(appointment.appointment_time, 'p')}
                   </p>
                 </div>
               </div>
