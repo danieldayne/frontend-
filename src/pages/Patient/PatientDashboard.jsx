@@ -256,8 +256,8 @@ const PatientDashboard = () => {
       // Add cache busting for fresh data after payment
       const cacheBuster = Date.now();
       const [appointmentsRes, paymentsRes] = await Promise.all([
-        api.get('/appointments'),
-        api.get('/payments/history')
+        api.get('/api/appointments'),
+        api.get('/api/payments/history')
       ]);
 
       console.log('✅ PatientDashboard - API calls completed successfully');
