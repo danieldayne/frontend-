@@ -28,7 +28,7 @@ export class PaymentStatusMonitor {
 
     this.intervalId = setInterval(async () => {
       try {
-        const response = await api.get(`/appointments/${appointmentId}`);
+        const response = await api.get(`/api/appointments/${appointmentId}`);
         const appointment = response.data.appointment;
         
         if (appointment && appointment.payment_status === 'paid') {
@@ -64,7 +64,7 @@ export class PaymentStatusMonitor {
     try {
       console.log(`🔧 [FRONTEND MONITOR] Requesting manual fix for appointment ${appointmentId}`);
       
-      const response = await api.patch(`/payments/fix-appointment/${appointmentId}`);
+      const response = await api.patch(`/api/payments/fix-appointment/${appointmentId}`);
       
       console.log('✅ [FRONTEND MONITOR] Manual fix successful:', response.data);
       return {
@@ -89,7 +89,7 @@ export class PaymentStatusMonitor {
     try {
       console.log(`🔍 [FRONTEND MONITOR] Checking sync status for appointment ${appointmentId}`);
       
-      const response = await api.get(`/payments/debug-appointment/${appointmentId}`);
+      const response = await api.get(`/api/payments/debug-appointment/${appointmentId}`);
       
       return {
         success: true,
@@ -114,7 +114,7 @@ export class PaymentStatusMonitor {
       console.log('💳 [FRONTEND MONITOR] Executing payment with enhanced monitoring...');
       
       // Execute the payment
-      const response = await api.post('/payments/execute', paymentData);
+      const response = await api.post('/api/payments/execute', paymentData);
       
       console.log('✅ [FRONTEND MONITOR] Payment execution response:', response.data);
       

@@ -67,7 +67,7 @@ const PaymentSuccess = () => {
         const currentToken = localStorage.getItem('access_token');
         console.log('🔄 PaymentSuccess - API request details:', {
           method: 'PATCH',
-          url: `/appointments/fix-payment-status/${pendingAppointmentId}`,
+          url: `/api/appointments/fix-payment-status/${pendingAppointmentId}`,
           headers: {
             'Authorization': `Bearer ${currentToken}`,
             'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ const PaymentSuccess = () => {
         });
         
         try {
-          const updateResponse = await api.patch(`/appointments/fix-payment-status/${pendingAppointmentId}`);
+          const updateResponse = await api.patch(`/api/appointments/fix-payment-status/${pendingAppointmentId}`);
           console.log('✅ PaymentSuccess - Pending appointment status updated successfully!');
           console.log('✅ PaymentSuccess - Update response:', updateResponse.data);
           console.log('✅ PaymentSuccess - Response status:', updateResponse.status);
