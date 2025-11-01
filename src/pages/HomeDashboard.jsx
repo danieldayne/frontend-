@@ -58,8 +58,8 @@ const HomeDashboard = () => {
         ]);
         
         data = {
-          appointments: appointmentsRes.data || [],
-          stats: statsRes.data || {},
+          appointments: (appointmentsRes?.data?.appointments) ?? (Array.isArray(appointmentsRes?.data) ? appointmentsRes.data : []),
+          stats: (statsRes?.data && typeof statsRes.data === 'object') ? statsRes.data : {},
           recentActivity: []
         };
       } else if (user.role === 'dentist') {
@@ -70,8 +70,8 @@ const HomeDashboard = () => {
         ]);
         
         data = {
-          appointments: appointmentsRes.data || [],
-          stats: statsRes.data || {},
+          appointments: (appointmentsRes?.data?.appointments) ?? (Array.isArray(appointmentsRes?.data) ? appointmentsRes.data : []),
+          stats: (statsRes?.data && typeof statsRes.data === 'object') ? statsRes.data : {},
           recentActivity: []
         };
       } else if (user.role === 'admin') {
@@ -82,7 +82,7 @@ const HomeDashboard = () => {
         
         data = {
           appointments: [],
-          stats: statsRes.data || {},
+          stats: (statsRes?.data && typeof statsRes.data === 'object') ? statsRes.data : {},
           recentActivity: []
         };
       }
