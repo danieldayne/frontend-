@@ -208,7 +208,7 @@ const PatientDashboard = () => {
   const fetchUserProfile = async () => {
     try {
       console.log('Fetching user profile...');
-      const response = await api.get('/profile/profile');
+      const response = await api.get('/api/profile/profile');
       
       if (response.data && response.data.user) {
         const userData = response.data.user;
