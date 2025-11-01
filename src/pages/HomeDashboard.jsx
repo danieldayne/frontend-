@@ -50,7 +50,11 @@ const HomeDashboard = () => {
         // Load patient-specific data
         const [appointmentsRes, statsRes] = await Promise.all([
           api.get('/api/appointments'),
-          api.get('/api/patient/stats')
+          // patient stats may not exist yet on backend; if 404, fall back to empty object
+          api.get('/api/patient/stats').catch(err => {
+            if (err?.response?.status === 404) return { data: {} };
+            throw err;
+          })
         ]);
         
         data = {
